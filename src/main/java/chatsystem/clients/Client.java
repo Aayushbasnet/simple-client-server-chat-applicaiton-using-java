@@ -2,7 +2,6 @@ package chatsystem.clients;
 
 import java.io.*;
 import java.net.*;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class Client {
@@ -28,6 +27,7 @@ public class Client {
                 String clientMessageToBeSent;
                 @Override
                 public void run() {
+                    System.out.println("Client send thread started");
                     while(true){
                         System.out.println("Write a message client::");
                         clientMessageToBeSent = clientMessageInput.nextLine();
@@ -37,17 +37,18 @@ public class Client {
                 }
             });
 
-            System.out.println("Receiver send thread started");
-            senderThread.start();
-
             Thread receiveThread = new Thread(new Runnable(){
                 String receivedMessage;
                 @Override
                 public void run(){
+                    System.out.println("Client receive thread started");
+
                     try {
                         receivedMessage = in.readLine();
-                        if(!Objects.equals(receivedMessage, "exit")){
-                            System.out.println("Server message received by client::");
+                        while(clientSocket.isConnected() && receivedMessage != null && !receivedMessage.equals("exit")){
+                            System.out.println("Server message received by client::" + receivedMessage);
+                            System.out.println("-------------------------------------------------------------------");
+                            System.out.println("Press enter to reply");
                             receivedMessage = in.readLine();
                         }
                         System.out.println("Server has been disconnected");
@@ -62,6 +63,8 @@ public class Client {
                 }
             });
             receiveThread.start();
+            senderThread.start();
+
         }catch (IOException e){
             e.printStackTrace();
         }

@@ -1,8 +1,11 @@
 package chatsystem.servers;
 
-import java.io.*;
-import java.net.*;
-import java.util.Objects;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class Server {
@@ -40,6 +43,7 @@ public class Server {
                 String toSendMessage; // variable that will contain the data written by the user
                 @Override
                 public void run() {
+                    System.out.println("Server send thread started");
                     while(true){
                         System.out.println("Write a message sender:: ");
                         toSendMessage = userMessage.nextLine();
@@ -49,18 +53,19 @@ public class Server {
                 }
             });
 
-            System.out.println("Sender send thread started");
-            senderThread.start();
-
             Thread receiveThread = new Thread(new Runnable() {
                 String receivedMessage;
                 @Override
                 public void run() {
+                    System.out.println("Server receive thread started");
+
                     try{
                         receivedMessage = in.readLine(); // read data from the clientSocket using "in" object
                         // While the client is still connected to the server
-                        while (!Objects.equals(receivedMessage, "exit")){
+                        while ( clientSocket.isConnected() && receivedMessage != null && !receivedMessage.equals("exit")){
                             System.out.println("Client message received by server:: " + receivedMessage);
+                            System.out.println("-------------------------------------------------------------------");
+                            System.out.println("Press enter to reply");
                             receivedMessage = in.readLine();
                         }
                         System.out.println( "Client disconnected");
@@ -75,8 +80,9 @@ public class Server {
                     }
                 }
             });
-            System.out.println("Sender receive thread started");
             receiveThread.start();
+            senderThread.start();
+
         }catch(IOException e){
             e.printStackTrace();
         }

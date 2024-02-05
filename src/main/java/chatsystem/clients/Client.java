@@ -19,6 +19,12 @@ public class Client {
         int socketPort = userInput.nextInt();
 
         try{
+            /*
+                No need to use clientSocket.connect() as we can directly specify ip and port in new Socket(host, port).
+                Flow:
+                socket() -> connect(serverAddress)
+                where serverAddress is, InetSocketAddress serverAddress = new InetSocketAddress(String host(eg: localhost), int portNumber);
+             */
             clientSocket = new Socket(host, socketPort);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream());
